@@ -23,7 +23,19 @@ def build(bld):
         return ' '.join(os.path.join('text', s) for s in sources)
     sources = make_sources([
         'Introduction',
+        ('TypeTheory', [
+            'Mltt',
+            'Hott',
+            'Hit',
+            'Conditions',
         ]),
+        ('CwComplexes', [
+            'Complexes',
+        ]),
+        ('Equivalence', [
+            'Cubical',
+            'Fillers',
+            'TypeFillers',
         ]),
         'Conclusion',
         'Licensing',

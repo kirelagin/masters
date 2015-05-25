@@ -1,0 +1,181 @@
+Заполнители в теории типов
+---------------------------
+
+
+В теории типов естественно в качестве $n$-мерных ячеек рассматривать
+$n$-пути. Всегда ли можно заполнить короб, составленный из $n$-путей?
+Оказывается, что всегда.
+
+Начнем с простейшего случая, с заполнения $0$-короба.
+По определению, $0$-короб состоит из одной точки:
+
+~~~~{label=lst:open-box-0}
+record open-box-0 (X : I -> Type) where
+    constructor open-box-0
+    xl : X left
+ -- xr is missing
+~~~~
+
+Заполнить его — значит провести 1-путь (в единственном
+имеющемся направлении), соединяющий точку `xl` с некоторой
+точкой из `X right`:
+
+~~~~{label=lst:fill-1-type}
+fill-1 : (X : I -> Type)
+      -> open-box-0 X
+      -> (i1 : I) -> X i1
+~~~~
+
+Условие, что проведенный путь начинается в точке `xl`,
+эквивалентно тому, что следующее определение проходит проверку типов:
+
+
+~~~~{label=lst:fill-1-cond}
+cond-1-l : (X : I -> Type)
+        -> (xl : X left)
+        -> fill-1 X (open-box-0 xl) left = xl
+cond-1-l X xl = idp
+~~~~
+
+Заполнитель для $0$-короба — ни что иное, как `coe`:
+
+~~~~{label=lst:fill-1-term}
+fill-1 X b i1 = coe X left (b.xl) i1
+~~~~
+
+Каждый следующий заполнитель выражается через предыдущий. Например,
+заполнитель для $1$-короба приведен в \inlref{листинге}{lst:fill-2}.
+
+
+~~~~{label=lst:fill-2 float=ht caption="Заполнитель для $2$-короба"}
+record open-box-1 (X : I -> I -> Type) where
+    constructor open-box-1
+    -- Vertices
+    xll : X left  left
+    xlr : X left  right
+    xrl : X right left
+    xrr : X right right
+    -- Edges
+    x_l : Path (\i1 -> X i1 left ) xll xrl
+    x_r : Path (\i1 -> X i1 right) xlr xrr
+    xl_ : Path (\i2 -> X left  i2) xll xlr
+ -- xr_ is missing
+
+fill-2 : (X : I -> I -> Type)
+      -> open-box-1 X
+      -> (i1 i2 : I) -> X i1 i2
+fill-2 X b i1 i2 = fill-1 (\i1 -> Path (\i2 -> X i1 i2)
+                                       (b.x_l @ i1) (b.x_r @ i1))
+                          (open-box-1 (b.xl_))
+                          i1 @ i2
+
+cond-2-_l : (X : I -> I -> Type)
+            (b : open-box-1 X)
+         -> (i1 : I) -> fill-2 X b i1 left = (b.x_l) @ i1
+cond-2-_l _ _ _ = idp
+
+cond-2-_r : (X : I -> I -> Type)
+            (b : open-box-1 X)
+         -> (i1 : I) -> fill-2 X b i1 right = (b.x_r) @ i1
+cond-2-_r _ _ _ = idp
+
+cond-2-l_ : (X : I -> I -> Type)
+            (b : open-box-1 X)
+         -> (i2 : I) -> fill-2 X b left i2 = (b.xl_) @ i2
+cond-2-l_ _ _ _ = idp
+~~~~
+
+Продемонстрируем заполнение $n$-короба на примере $n=3$.
+В общем случае, имеются $(n+1)$ направление $i_1, i_2, …, i_{n+1}$ и,
+соответственно, зависимый тип `X : I -> I -> … -> I -> Type`.
+Открытый короб, составленный из путей в этом типе, определяется
+как `record` с конструкторами, соответствующими всем вершинам,
+ребрам, двумерным поверхностям, трехмерным поверхностям и так далее
+вплоть до $n$. $n$-мерных поверхностей на одну меньше, чем
+в полном кубе.
+В \inlref{листинге}{lst:open-box-2} приведено
+определение типа `open-box-2`. <!-- TODO: картинка с кубом и стрелочками на гранях -->
+
+~~~~{label=lst:open-box-2 float=ht caption="Определение открытого 3-короба"}
+record open-box-2 (X : I -> I -> I -> Type) where
+    constructor open-box-2
+    -- Vertices
+    xlll : X left  left  left
+    xllr : X left  left  right
+    xlrl : X left  right left
+    xlrr : X left  right right
+    xrll : X right left  left
+    xrlr : X right left  right
+    xrrl : X right right left
+    xrrr : X right right right
+    -- Edges
+    x_ll : Path (\i1 -> X i1 left  left ) xlll xrll
+    x_lr : Path (\i1 -> X i1 left  right) xllr xrlr
+    x_rl : Path (\i1 -> X i1 right left ) xlrl xrrl
+    x_rr : Path (\i1 -> X i1 right right) xlrr xrrr
+    xl_l : Path (\i2 -> X left  i2 left ) xlll xlrl
+    xl_r : Path (\i2 -> X left  i2 right) xllr xlrr
+    xr_l : Path (\i2 -> X right i2 left ) xrll xrrl
+    xr_r : Path (\i2 -> X right i2 right) xrlr xrrr
+    xll_ : Path (\i3 -> X left  left  i3) xlll xllr
+    xlr_ : Path (\i3 -> X left  right i3) xlrl xlrr
+    xrl_ : Path (\i3 -> X right left  i3) xrll xrlr
+    xrr_ : Path (\i3 -> X right right i3) xrrl xrrr
+    -- 2-dimensional surfaces
+    x__l : Path (\i1 -> Path (\i2 -> X i1 i2 left )
+                             (x_ll @ i1) (x_rl @ i1))
+                xl_l xr_l
+    x__r : Path (\i1 -> Path (\i2 -> X i1 i2 right)
+                             (x_lr @ i1) (x_rr @ i1))
+                xl_r xr_r
+    x_l_ : Path (\i1 -> Path (\i3 -> X i1 left  i3)
+                             (x_ll @ i1) (x_lr @ i1))
+                xll_ xrl_
+    x_r_ : Path (\i1 -> Path (\i3 -> X i1 right i3)
+                        (x_rl @ i1) (x_rr @ i1))
+                xlr_ xrr_
+    xl__ : Path (\i2 -> Path (\i3 -> X left  i2 i3)
+                             (xl_l @ i2) (xl_r @ i2))
+                xll_ xlr_
+ -- xr__ is missing
+~~~~
+
+При этом, чтобы термы имели простой вид, важно правильным
+образом выбрать то выделенное направление, в котором будет отсутствовать грань,
+а также, поскольку высшие пути представляют собой одномерные пути
+в пространстве путей (возможно, также высших), важен порядок перечисления
+изменяющихся координат в типе пути.
+К примеру, в определении `open-box-2` путь `x__l`, соответствующий грани
+$i_3$ `= left`, можно определить как путь между `xl_l` и `xr_l`
+(в этом случае получим путь вдоль $i_1$ в пространстве путей вдоль $i_2$),
+либо как путь между `x_ll` и `x_rl` (получим путь вдоль $i_2$ в
+пространстве путей вдоль $i_1$). Удобнее оказывается сохранять
+естественный порядок координат, то есть следует выбрать первый вариант.
+<!-- TODO: когда будет картинка, объяснить понятнее, ссылаясь на стрелочки на ней -->
+
+Имея `open-box-n`, можно записать тип заполнителя в общем случае:
+
+~~~~
+fill-n : (X : I -> I -> … -> I -> Type)
+      -> open-box-(n-1) X
+      -> (i1 i2 … in : I) -> X i1 i2 … in
+~~~~
+
+Ключевая идея при построении терма, имеющего такой тип: рассматривать
+пути в пространстве, заданном поверхностью короба, и, поскольку его
+размерность на единицу меньше, в нём можно будет, по индукции, найти
+заполнитель. В \inlref{листинге}{lst:fill-3} приведен заполнитель
+для $2$-короба, а на \inlref{рисунке}{img:???} <!-- TODO: img -->
+обозначены пути и подпространства, используемые при его построении.
+
+~~~{label=lst:fill-3 float=ht caption="Определение $3$-мерного заполнителя"}
+fill-3 : (X : I -> I -> I -> Type)
+      -> open-box-2 X
+      -> (i1 i2 i3 : I) -> X i1 i2 i3
+fill-3 X b i1 i2 i3 =
+  fill-2 (\i1 i2 -> Path (\i3 -> X i1 i2 i3)
+                         ((b.x__l) @ i1 @ i2) ((b.x__r) @ i1 @ i2))
+         (open-box-1 (b.xll_) (b.xlr_) (b.xrl_) (b.xrr_)
+                     (b.x_l_) (b.x_r_) (b.xl__))
+         i1 i2 @ i3
+~~~~
