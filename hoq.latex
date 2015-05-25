@@ -1,0 +1,11 @@
+\lstdefinelanguage{hoq}{%
+  sensitive=true,
+  alsoletter={-},
+  keywords={where, with,
+            data, record, constructor,
+            I, left, right, coe,
+            Type},
+  otherkeywords={->, :, \\},
+  morecomment=[l]{--},
+  morecomment=[s]{\{-}{-\}},
+}

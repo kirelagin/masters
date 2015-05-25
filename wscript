@@ -23,17 +23,10 @@ def build(bld):
         return ' '.join(os.path.join('text', s) for s in sources)
     sources = make_sources([
         'Introduction',
-        ('Basics', [
-            'Chapters',
-            'Special',
-            'Markdown',
-            'Maths',
         ]),
-        ('Floats', [
-            'Listings',
-            'Refs',
         ]),
         'Conclusion',
+        'Licensing',
     ])
 
     bld(features='pandoc-merge', source=sources + ' bib.bib', target='text.latex',
