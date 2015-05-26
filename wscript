@@ -36,6 +36,7 @@ def build(bld):
             'Cubical',
             'Fillers',
             'TypeFillers',
+            'Gluing',
         ]),
         'Conclusion',
         'Licensing',
