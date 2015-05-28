@@ -9,9 +9,9 @@ $n$-пути. Всегда ли можно заполнить короб, сос
 Начнем с простейшего случая, с заполнения $0$-короба.
 По определению, $0$-короб состоит из одной точки:
 
-~~~~{label=lst:open-box-0}
-record open-box-0 (X : I -> Type) where
-    constructor open-box-0
+~~~~{label=lst:box-0}
+record box-0 (X : I -> Type) where
+    constructor box-0
     xl : X left
  -- xr is missing
 ~~~~
@@ -22,7 +22,7 @@ record open-box-0 (X : I -> Type) where
 
 ~~~~{label=lst:fill-1-type}
 fill-1 : (X : I -> Type)
-      -> open-box-0 X
+      -> box-0 X
       -> (i1 : I) -> X i1
 ~~~~
 
@@ -33,7 +33,7 @@ fill-1 : (X : I -> Type)
 ~~~~{label=lst:fill-1-cond}
 cond-1-l : (X : I -> Type)
         -> (xl : X left)
-        -> fill-1 X (open-box-0 xl) left = xl
+        -> fill-1 X (box-0 xl) left = xl
 cond-1-l X xl = idp
 ~~~~
 
@@ -48,8 +48,8 @@ fill-1 X b i1 = coe X left (b.xl) i1
 
 
 ~~~~{label=lst:fill-2 float=ht caption="Заполнитель для $2$-короба"}
-record open-box-1 (X : I -> I -> Type) where
-    constructor open-box-1
+record box-1 (X : I -> I -> Type) where
+    constructor box-1
     -- Vertices
     xll : X left  left
     xlr : X left  right
@@ -62,120 +62,144 @@ record open-box-1 (X : I -> I -> Type) where
  -- xr_ is missing
 
 fill-2 : (X : I -> I -> Type)
-      -> open-box-1 X
+      -> box-1 X
       -> (i1 i2 : I) -> X i1 i2
 fill-2 X b i1 i2 = fill-1 (\i1 -> Path (\i2 -> X i1 i2)
                                        (b.x_l @ i1) (b.x_r @ i1))
-                          (open-box-1 (b.xl_))
+                          (box-1 (b.xl_))
                           i1 @ i2
 
 cond-2-_l : (X : I -> I -> Type)
-            (b : open-box-1 X)
+            (b : box-1 X)
          -> (i1 : I) -> fill-2 X b i1 left = (b.x_l) @ i1
 cond-2-_l _ _ _ = idp
 
 cond-2-_r : (X : I -> I -> Type)
-            (b : open-box-1 X)
+            (b : box-1 X)
          -> (i1 : I) -> fill-2 X b i1 right = (b.x_r) @ i1
 cond-2-_r _ _ _ = idp
 
 cond-2-l_ : (X : I -> I -> Type)
-            (b : open-box-1 X)
+            (b : box-1 X)
          -> (i2 : I) -> fill-2 X b left i2 = (b.xl_) @ i2
 cond-2-l_ _ _ _ = idp
 ~~~~
 
-Продемонстрируем заполнение $n$-короба на примере $n=3$.
 В общем случае, имеются $(n+1)$ направление $i_1, i_2, …, i_{n+1}$ и,
 соответственно, зависимый тип `X : I -> I -> … -> I -> Type`.
-Открытый короб, составленный из путей в этом типе, определяется
-как `record` с конструкторами, соответствующими всем вершинам,
-ребрам, двумерным поверхностям, трехмерным поверхностям и так далее
-вплоть до $n$. $n$-мерных поверхностей на одну меньше, чем
-в полном кубе.
-В \inlref{листинге}{lst:open-box-2} приведено
-определение типа `open-box-2`. <!-- TODO: картинка с кубом и стрелочками на гранях -->
+Идея состоит в том, чтобы перейти к пространству путей в
+каком-либо выбранном направлении, тем самым уменьшив размерность
+рассматриваемого пространства на единицу, и, по индукции,
+взять заполнитель в полученном пространстве меньшей размерности.
 
-~~~~{label=lst:open-box-2 float=ht caption="Определение открытого 3-короба"}
-record open-box-2 (X : I -> I -> I -> Type) where
-    constructor open-box-2
+При этом, есть два выделенных направления: то, в котором отсутствует
+грань, и то, которое будет «схлопнуто» переходом к путям в этом направлении.
+Чтобы термы имели простой вид, важно правильным
+образом выбрать эти два направления. Удобнее всего оказывается
+схлопывать последнее направление ($i_{n+1}$), поскольку в этом случае
+первые $n$ направлений остаются нетронутыми, что хорошо для индукционного вызова;
+соответственно, отсутствовать грань должна в направлении $i_1$.
+
+Также, для удобства, необходимо зафиксировать некоторый способ перечисления
+поверхностей короба. Например, можно перечислять их в порядке возрастания
+размерности, затем в лексикографическом порядке зафиксированных координат.
+Иными словами, каждой поверхности куба можно сопоставить вектор из $\{?, 0, 1\}^{n+1}$
+(где число вопросиков показывает размерность поверхности);
+на этих векторах можно ввести порядок: сначала два в вектора сравниваются по
+числу вопросиков, затем — лексикографически ($? < 0 < 1$); поверхности следует
+перечислять в соответствии с порядком на сопоставленных им векторах.
+В примерах кода в названиях переменных вместо `?`, `0`, `1` использованы `_`, `l`, `r`.
+
+Ещё один важный вопрос — в каком направлении проводить пути, являющиеся
+гранями куба. К примеру, в трехмерном кубе грани представляют собой 2-пути,
+т.е. пути в пространстве путей. Есть несколько вариантов описания такого типа:
+можно сказать, что это путь вдоль $i_1$ в пространстве путей вдоль $i_2$,
+а можно — что путь вдоль $i_2$ в пространстве $i_1$.
+Записывая типы, мы перечисляем координаты в естественном порядке, тем самым
+гарантируя, что всякий $k$-путь, который будет использован в индуктивном переходе,
+изначально является $k-1$-путем в пространстве путей вдоль $i_{n+1}$, так что
+его можно сразу же подставлять в рекурсивный вызов, никак не преобразовывая.
+
+На \inlref{рисунке}{img:box-2} изображено графически определение 2-короба, а
+\inlref{листинг}{lst:box-n} содержит схему определения типа `box-n` на языке hoq.
+<!-- TODO pic -->
+
+
+~~~~{label=lst:box-n float=ht caption="Схема определения открытого $n$-короба"}
+record box-n (X : I -> I -> … -> I -> Type) where
+    constructor box-n
     -- Vertices
-    xlll : X left  left  left
-    xllr : X left  left  right
-    xlrl : X left  right left
-    xlrr : X left  right right
-    xrll : X right left  left
-    xrlr : X right left  right
-    xrrl : X right right left
-    xrrr : X right right right
+    xl…ll : X left  … left  left
+    xl…lr : X left  … left  right
+    xl…rl : X left  … right left
+    xl…rr : X left  … right right
+    …
+    xr…ll : X right … left  left
+    xr…lr : X right … left  right
+    xr…rl : X right … right left
+    xr…rr : X right … right right
+
     -- Edges
-    x_ll : Path (\i1 -> X i1 left  left ) xlll xrll
-    x_lr : Path (\i1 -> X i1 left  right) xllr xrlr
-    x_rl : Path (\i1 -> X i1 right left ) xlrl xrrl
-    x_rr : Path (\i1 -> X i1 right right) xlrr xrrr
-    xl_l : Path (\i2 -> X left  i2 left ) xlll xlrl
-    xl_r : Path (\i2 -> X left  i2 right) xllr xlrr
-    xr_l : Path (\i2 -> X right i2 left ) xrll xrrl
-    xr_r : Path (\i2 -> X right i2 right) xrlr xrrr
-    xll_ : Path (\i3 -> X left  left  i3) xlll xllr
-    xlr_ : Path (\i3 -> X left  right i3) xlrl xlrr
-    xrl_ : Path (\i3 -> X right left  i3) xrll xrlr
-    xrr_ : Path (\i3 -> X right right i3) xrrl xrrr
+    x_l…ll : Path (\i1 -> X i1 left  … left  left ) xll…ll xrl…ll
+    x_l…lr : Path (\i1 -> X i1 left  … left  right) xll…lr xrl…lr
+    x_l…rl : Path (\i1 -> X i1 left  … right left ) xll…rl xrl…rl
+    x_l…rr : Path (\i1 -> X i1 left  … right right) xll…rr xrl…rr
+    …
+    x_r…ll : Path (\i1 -> X i1 right … left  left ) xlr…ll xrr…ll
+    x_r…lr : Path (\i1 -> X i1 right … left  right) xlr…lr xrr…lr
+    x_r…rl : Path (\i1 -> X i1 right … right left ) xlr…rl xrr…rl
+    x_r…rr : Path (\i1 -> X i1 right … right right) xlr…rr xrr…rr
+
+    …
+
+    xrr…l_ : Path (\in+1 -> X right right in+1) xrr…ll xrr…lr
+    xrr…r_ : Path (\in+1 -> X right right in+1) xrr…rl xrr…rr
+
     -- 2-dimensional surfaces
-    x__l : Path (\i1 -> Path (\i2 -> X i1 i2 left )
-                             (x_ll @ i1) (x_rl @ i1))
-                xl_l xr_l
-    x__r : Path (\i1 -> Path (\i2 -> X i1 i2 right)
-                             (x_lr @ i1) (x_rr @ i1))
-                xl_r xr_r
-    x_l_ : Path (\i1 -> Path (\i3 -> X i1 left  i3)
-                             (x_ll @ i1) (x_lr @ i1))
-                xll_ xrl_
-    x_r_ : Path (\i1 -> Path (\i3 -> X i1 right i3)
-                        (x_rl @ i1) (x_rr @ i1))
-                xlr_ xrr_
-    xl__ : Path (\i2 -> Path (\i3 -> X left  i2 i3)
-                             (xl_l @ i2) (xl_r @ i2))
-                xll_ xlr_
- -- xr__ is missing
+    x__l…l : Path (\i1 -> Path (\i2 -> X i1 i2 left … left)
+                               (x_l…ll @ i1) (x_r…ll @ i1))
+                  xl_l…l xr_l…l
+
+    …
+
+    -- n-dimensional surfaces
+    …
+    xl_…_ : Path (\i2 -> Path (\i3 -> … Path (\in+1 -> X left i2 … in+1)…))
+                 …
+                 xll_…_ xlr_…_
+ -- xr_…_ is missing
 ~~~~
 
-При этом, чтобы термы имели простой вид, важно правильным
-образом выбрать то выделенное направление, в котором будет отсутствовать грань,
-а также, поскольку высшие пути представляют собой одномерные пути
-в пространстве путей (возможно, также высших), важен порядок перечисления
-изменяющихся координат в типе пути.
-К примеру, в определении `open-box-2` путь `x__l`, соответствующий грани
-$i_3$ `= left`, можно определить как путь между `xl_l` и `xr_l`
-(в этом случае получим путь вдоль $i_1$ в пространстве путей вдоль $i_2$),
-либо как путь между `x_ll` и `x_rl` (получим путь вдоль $i_2$ в
-пространстве путей вдоль $i_1$). Удобнее оказывается сохранять
-естественный порядок координат, то есть следует выбрать первый вариант.
-<!-- TODO: когда будет картинка, объяснить понятнее, ссылаясь на стрелочки на ней -->
-
-Имея `open-box-n`, можно записать тип заполнителя в общем случае:
+Имея `box-n`, можно записать тип заполнителя в общем случае:
 
 ~~~~
 fill-n : (X : I -> I -> … -> I -> Type)
-      -> open-box-(n-1) X
+      -> box-(n-1) X
       -> (i1 i2 … in : I) -> X i1 i2 … in
 ~~~~
 
-Ключевая идея при построении терма, имеющего такой тип: рассматривать
-пути в пространстве, заданном поверхностью короба, и, поскольку его
-размерность на единицу меньше, в нём можно будет, по индукции, найти
-заполнитель. В \inlref{листинге}{lst:fill-3} приведен заполнитель
-для $2$-короба, а на \inlref{рисунке}{img:???} <!-- TODO: img -->
-обозначены пути и подпространства, используемые при его построении.
+Как было сказано выше, ключевая идея при построении терма, имеющего такой тип —
+перейти к пространству путей вдоль направления $i_{n+1}$ и,
+поскольку его размерность на единицу меньше, по индукции найти заполнитель.
+Выбранный способ перечисления вершин короба позволяет чисто механически
+получить необходимый короб меньшей размерности: достаточно перечислять
+поверхности исходного короба в том же порядке, заменяя последний символ
+в имени поверхности на подчеркивание (тем самым, повышая её размерность, ведь
+вершины в новом пространстве — пути, т.е. ребра исходного куба).
+В \inlref{листинге}{lst:fill-n} приведена схема построения заполнителя
+произвольной размерности.
 
-~~~{label=lst:fill-3 float=ht caption="Определение $3$-мерного заполнителя"}
-fill-3 : (X : I -> I -> I -> Type)
-      -> open-box-2 X
-      -> (i1 i2 i3 : I) -> X i1 i2 i3
-fill-3 X b i1 i2 i3 =
-  fill-2 (\i1 i2 -> Path (\i3 -> X i1 i2 i3)
-                         ((b.x__l) @ i1 @ i2) ((b.x__r) @ i1 @ i2))
-         (open-box-1 (b.xll_) (b.xlr_) (b.xrl_) (b.xrr_)
-                     (b.x_l_) (b.x_r_) (b.xl__))
-         i1 i2 @ i3
+~~~{label=lst:fill-3 float=ht caption="Схема заполнения открытого $n$-короба"}
+fill-n : (X : I -> I -> … -> I -> Type)
+      -> box-n X
+      -> (i1 i2 … in+1 : I) -> X i1 i2 … in+1
+fill-n X b i1 i2 … in+1 =
+  fill-n-1 (\i1 … in -> Path (\in+1 -> X i1 … in in+1)
+                             ((b.x_…_l) @ i1 @ … @ in)
+                             ((b.x_…_r) @ i1 @ … @ in))
+         (box-n-1 (b.xl…ll_) (b.xl…lr_) (b.xl…rl_) (b.xl…rr_)
+                   …
+                   (b.x_
+                   (b.xl_…_))
+         i1 … in @ in+1
 ~~~~
