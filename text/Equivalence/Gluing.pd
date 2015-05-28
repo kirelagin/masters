@@ -40,7 +40,7 @@ concat3 A a b c d p1 p2 p3 =
 из типа `I3` в тип `I` (три склеенных последовательно интервала),
 а также обратное к нему.
 
-~~~~{label=lst:I3-equiv float=ht caption="Эквивалентность `I` и `I3`}
+~~~~{label=lst:I3-equiv float=ht caption="Эквивалентность \lstinline{I} и \lstinline{I3}"}
 data I3 = first I | second I | third I
   with
     first right = second left
