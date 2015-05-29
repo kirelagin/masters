@@ -32,14 +32,19 @@ def build(bld):
         ('CwComplexes', [
             'Complexes',
         ]),
-        ('Equivalence', [
+        ('Fillers', [
             'Cubical',
             'Fillers',
             'TypeFillers',
+            'Use',
+        ]),
+        ('Equivalence', [
             'Gluing',
         ]),
+        ('PatternMatching', [
+        ]),
         'Conclusion',
-        'Licensing',
+#        'Licensing',
     ])
 
     bld(features='pandoc-merge', source=sources + ' bib.bib', target='text.latex',
