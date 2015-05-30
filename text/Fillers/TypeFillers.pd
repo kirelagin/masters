@@ -12,12 +12,12 @@ $n$-пути. Всегда ли можно заполнить короб, сос
 ~~~~{label=lst:box-0}
 record box-0 (X : I -> Type) where
     constructor box-0
-    xl : X left
- -- xr is missing
+    l : X left
+ -- r is missing
 ~~~~
 
 Заполнить его — значит провести $1$-путь (в единственном
-имеющемся направлении), соединяющий точку `xl` из `X left` с некоторой
+имеющемся направлении), соединяющий точку `l` из `X left` с некоторой
 точкой из `X right`:
 
 ~~~~{label=lst:fill-1-type}
@@ -26,21 +26,21 @@ fill-1 : (X : I -> Type)
       -> (i1 : I) -> X i1
 ~~~~
 
-Условие, что проведенный путь начинается в точке `xl`,
+Условие, что проведенный путь начинается в точке `l`,
 эквивалентно тому, что следующее определение проходит проверку типов:
 
 
 ~~~~{label=lst:fill-1-cond}
 cond-1-l : (X : I -> Type)
-        -> (xl : X left)
-        -> fill-1 X (box-0 xl) left = xl
-cond-1-l X xl = idp
+        -> (l : X left)
+        -> fill-1 X (box-0 l) left = l
+cond-1-l X l = idp
 ~~~~
 
 Заполнитель для $0$-короба — ни что иное, как `coe`:
 
 ~~~~{label=lst:fill-1-term}
-fill-1 X b i1 = coe X left (b.xl) i1
+fill-1 X b i1 = coe X left (b.l) i1
 ~~~~
 
 Каждый следующий заполнитель выражается через предыдущий. Например,
@@ -51,37 +51,37 @@ fill-1 X b i1 = coe X left (b.xl) i1
 record box-1 (X : I -> I -> Type) where
     constructor box-1
     -- Vertices
-    xll : X left  left
-    xlr : X left  right
-    xrl : X right left
-    xrr : X right right
+    ll : X left  left
+    lr : X left  right
+    rl : X right left
+    rr : X right right
     -- Edges
-    x_l : Path (\i1 -> X i1 left ) xll xrl
-    x_r : Path (\i1 -> X i1 right) xlr xrr
-    xl_ : Path (\i2 -> X left  i2) xll xlr
- -- xr_ is missing
+    _l : Path (\i1 -> X i1 left ) ll rl
+    _r : Path (\i1 -> X i1 right) lr rr
+    l_ : Path (\i2 -> X left  i2) ll lr
+ -- r_ is missing
 
 fill-2 : (X : I -> I -> Type)
       -> box-1 X
       -> (i1 i2 : I) -> X i1 i2
 fill-2 X b i1 i2 = fill-1 (\i1 -> Path (\i2 -> X i1 i2)
-                                       (b.x_l @ i1) (b.x_r @ i1))
-                          (box-1 (b.xl_))
+                                       (b._l @ i1) (b._r @ i1))
+                          (box-1 (b.l_))
                           i1 @ i2
 
 cond-2-_l : (X : I -> I -> Type)
             (b : box-1 X)
-         -> (i1 : I) -> fill-2 X b i1 left = (b.x_l) @ i1
+         -> (i1 : I) -> fill-2 X b i1 left = (b._l) @ i1
 cond-2-_l _ _ _ = idp
 
 cond-2-_r : (X : I -> I -> Type)
             (b : box-1 X)
-         -> (i1 : I) -> fill-2 X b i1 right = (b.x_r) @ i1
+         -> (i1 : I) -> fill-2 X b i1 right = (b._r) @ i1
 cond-2-_r _ _ _ = idp
 
 cond-2-l_ : (X : I -> I -> Type)
             (b : box-1 X)
-         -> (i2 : I) -> fill-2 X b left i2 = (b.xl_) @ i2
+         -> (i2 : I) -> fill-2 X b left i2 = (b.l_) @ i2
 cond-2-l_ _ _ _ = idp
 ~~~~
 
@@ -130,45 +130,45 @@ cond-2-l_ _ _ _ = idp
 record box-n (X : I -> I -> … -> I -> Type) where
     constructor box-n
     -- Vertices
-    xl…ll : X left  … left  left
-    xl…lr : X left  … left  right
-    xl…rl : X left  … right left
-    xl…rr : X left  … right right
+    l…ll : X left  … left  left
+    l…lr : X left  … left  right
+    l…rl : X left  … right left
+    l…rr : X left  … right right
     …
-    xr…ll : X right … left  left
-    xr…lr : X right … left  right
-    xr…rl : X right … right left
-    xr…rr : X right … right right
+    r…ll : X right … left  left
+    r…lr : X right … left  right
+    r…rl : X right … right left
+    r…rr : X right … right right
 
     -- Edges
-    x_l…ll : Path (\i1 -> X i1 left  … left  left ) xll…ll xrl…ll
-    x_l…lr : Path (\i1 -> X i1 left  … left  right) xll…lr xrl…lr
-    x_l…rl : Path (\i1 -> X i1 left  … right left ) xll…rl xrl…rl
-    x_l…rr : Path (\i1 -> X i1 left  … right right) xll…rr xrl…rr
+    _l…ll : Path (\i1 -> X i1 left  … left  left ) ll…ll rl…ll
+    _l…lr : Path (\i1 -> X i1 left  … left  right) ll…lr rl…lr
+    _l…rl : Path (\i1 -> X i1 left  … right left ) ll…rl rl…rl
+    _l…rr : Path (\i1 -> X i1 left  … right right) ll…rr rl…rr
     …
-    x_r…ll : Path (\i1 -> X i1 right … left  left ) xlr…ll xrr…ll
-    x_r…lr : Path (\i1 -> X i1 right … left  right) xlr…lr xrr…lr
-    x_r…rl : Path (\i1 -> X i1 right … right left ) xlr…rl xrr…rl
-    x_r…rr : Path (\i1 -> X i1 right … right right) xlr…rr xrr…rr
+    _r…ll : Path (\i1 -> X i1 right … left  left ) lr…ll rr…ll
+    _r…lr : Path (\i1 -> X i1 right … left  right) lr…lr rr…lr
+    _r…rl : Path (\i1 -> X i1 right … right left ) lr…rl rr…rl
+    _r…rr : Path (\i1 -> X i1 right … right right) lr…rr rr…rr
 
     …
 
-    xrr…l_ : Path (\in+1 -> X right right in+1) xrr…ll xrr…lr
-    xrr…r_ : Path (\in+1 -> X right right in+1) xrr…rl xrr…rr
+    rr…l_ : Path (\in+1 -> X right right in+1) rr…ll rr…lr
+    rr…r_ : Path (\in+1 -> X right right in+1) rr…rl rr…rr
 
     -- 2-dimensional surfaces
-    x__l…l : Path (\i1 -> Path (\i2 -> X i1 i2 left … left)
-                               (x_l…ll @ i1) (x_r…ll @ i1))
-                  xl_l…l xr_l…l
+    __l…l : Path (\i1 -> Path (\i2 -> X i1 i2 left … left)
+                               (_l…ll @ i1) (_r…ll @ i1))
+                  l_l…l r_l…l
 
     …
 
     -- n-dimensional surfaces
     …
-    xl_…_ : Path (\i2 -> Path (\i3 -> … Path (\in+1 -> X left i2 … in+1)…))
+    l_…_ : Path (\i2 -> Path (\i3 -> … Path (\in+1 -> X left i2 … in+1)…))
                  …
-                 xll_…_ xlr_…_
- -- xr_…_ is missing
+                 ll_…_ lr_…_
+ -- r_…_ is missing
 ~~~~
 
 Имея `box-n`, можно записать тип заполнителя в общем случае:
@@ -196,11 +196,11 @@ fill-n : (X : I -> I -> … -> I -> Type)
       -> (i1 i2 … in+1 : I) -> X i1 i2 … in+1
 fill-n X b i1 i2 … in+1 =
   fill-n-1 (\i1 … in -> Path (\in+1 -> X i1 … in in+1)
-                             ((b.x_…_l) @ i1 @ … @ in)
-                             ((b.x_…_r) @ i1 @ … @ in))
-         (box-n-1 (b.xl…ll_) (b.xl…lr_) (b.xl…rl_) (b.xl…rr_)
+                             ((b._…_l) @ i1 @ … @ in)
+                             ((b._…_r) @ i1 @ … @ in))
+         (box-n-1 (b.l…ll_) (b.l…lr_) (b.l…rl_) (b.l…rr_)
                    …
-                   (b.x_
-                   (b.xl_…_))
+                   (b._
+                   (b.l_…_))
          i1 … in @ in+1
 ~~~~
