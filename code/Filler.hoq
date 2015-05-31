@@ -1,0 +1,160 @@
+import Basic
+
+
+record box-0 (X : I -> Type) where
+    constructor box-0
+    xl : X left
+
+fill-1 : (X : I -> Type)
+      -> box-0 X
+      -> (i1 : I) -> X i1
+fill-1 X b i1 = coe X left (b.xl) i1
+
+cond-1-l : (X : I -> Type)
+        -> (xl : X left)
+        -> fill-1 X (box-0 xl) left = xl
+cond-1-l _ _ = idp
+
+
+----------------------------------------------------------------------------
+
+
+record box-1 (X : I -> I -> Type) where
+    constructor box-1
+    xll : X left  left
+    xlr : X left  right
+    xrl : X right left
+    xrr : X right right
+
+    x_l : Path (\i1 -> X i1 left ) xll xrl
+    x_r : Path (\i1 -> X i1 right) xlr xrr
+    xl_ : Path (\i2 -> X left  i2) xll xlr
+
+fill-2 : (X : I -> I -> Type)
+      -> box-1 X
+      -> (i1 i2 : I) -> X i1 i2
+fill-2 X b i1 i2 = fill-1 (\i1 -> Path (\i2 -> X i1 i2) (b.x_l @ i1) (b.x_r @ i1))
+                          (box-0 (b.xl_))
+                          i1 @ i2
+
+cond-2-_l : (X : I -> I -> Type)
+            (b : box-1 X)
+         -> (i1 : I) -> fill-2 X b i1 left = (b.x_l) @ i1
+cond-2-_l _ _ _ = idp
+
+cond-2-_r : (X : I -> I -> Type)
+            (b : box-1 X)
+         -> (i1 : I) -> fill-2 X b i1 right = (b.x_r) @ i1
+cond-2-_r _ _ _ = idp
+
+cond-2-l_ : (X : I -> I -> Type)
+            (b : box-1 X)
+         -> (i2 : I) -> fill-2 X b left i2 = (b.xl_) @ i2
+cond-2-l_ _ _ _ = idp
+
+fill-2-face : (X : I -> I -> Type)
+           -> (b : box-1 X)
+           -> Path (\i2 -> X right i2) (b.xrl) (b.xrr)
+fill-2-face X b = path (\i2 -> fill-2 X b right i2)
+
+
+
+fill-2-h : (X : I -> I -> Type)
+        -> (b : box-1 X)
+        -> Path (\i -> Path (\j -> X i j)
+                            (b.x_l @ i)
+                            (b.x_r @ i))
+                (b.xl_)
+                (path (\i -> fill-2 X b right i))
+fill-2-h X b = path (\i -> path (\j -> fill-2 X b i j))
+
+fill-2-h' : (X : Type)
+         -> (b : box-1 (\_ _ -> X))
+         -> Path (\i -> (b.x_l @ i) = (b.x_r @ i))
+                (b.xl_)
+                (path (\i -> fill-2 (\_ _ -> X) b right i))
+fill-2-h' X b = path (\i -> path (\j -> fill-2 (\_ _ -> X) b i j))
+
+fill-2-v : (X : I -> I -> Type)
+        -> (b : box-1 X)
+        -> Path (\j -> Path (\i -> X i j)
+                            (b.xl_ @ j)
+                            (fill-2 X b right j))
+                (b.x_l)
+                (b.x_r)
+fill-2-v X b = path (\j -> path (\i -> fill-2 X b i j))
+
+fill-2-v' : (X : Type)
+         -> (b : box-1 (\_ _ -> X))
+         -> Path (\j -> (b.xl_ @ j) = (fill-2 (\_ _ -> X) b right j))
+                 (b.x_l)
+                 (b.x_r)
+fill-2-v' X b = path (\j -> path (\i -> fill-2 (\_ _ -> X) b i j))
+
+
+----------------------------------------------------------------------------
+
+
+record box-2 (X : I -> I -> I -> Type) where
+    constructor box-2
+    -- Vertices
+    xlll : X left  left  left
+    xllr : X left  left  right
+    xlrl : X left  right left
+    xlrr : X left  right right
+    xrll : X right left  left
+    xrlr : X right left  right
+    xrrl : X right right left
+    xrrr : X right right right
+    -- Edges
+    x_ll : Path (\i1 -> X i1 left  left ) xlll xrll
+    x_lr : Path (\i1 -> X i1 left  right) xllr xrlr
+    x_rl : Path (\i1 -> X i1 right left ) xlrl xrrl
+    x_rr : Path (\i1 -> X i1 right right) xlrr xrrr
+    xl_l : Path (\i2 -> X left  i2 left ) xlll xlrl
+    xl_r : Path (\i2 -> X left  i2 right) xllr xlrr
+    xr_l : Path (\i2 -> X right i2 left ) xrll xrrl
+    xr_r : Path (\i2 -> X right i2 right) xrlr xrrr
+    xll_ : Path (\i3 -> X left  left  i3) xlll xllr
+    xlr_ : Path (\i3 -> X left  right i3) xlrl xlrr
+    xrl_ : Path (\i3 -> X right left  i3) xrll xrlr
+    xrr_ : Path (\i3 -> X right right i3) xrrl xrrr
+    -- 2-dimensional surfaces
+    x__l : Path (\i1 -> Path (\i2 -> X i1 i2 left ) (x_ll @ i1) (x_rl @ i1)) xl_l xr_l
+    x__r : Path (\i1 -> Path (\i2 -> X i1 i2 right) (x_lr @ i1) (x_rr @ i1)) xl_r xr_r
+    x_l_ : Path (\i1 -> Path (\i3 -> X i1 left  i3) (x_ll @ i1) (x_lr @ i1)) xll_ xrl_
+    x_r_ : Path (\i1 -> Path (\i3 -> X i1 right i3) (x_rl @ i1) (x_rr @ i1)) xlr_ xrr_
+    xl__ : Path (\i2 -> Path (\i3 -> X left  i2 i3) (xl_l @ i2) (xl_r @ i2)) xll_ xlr_
+ -- xr__ is missing
+
+fill-3 : (X : I -> I -> I -> Type)
+      -> box-2 X
+      -> (i1 i2 i3 : I) -> X i1 i2 i3
+fill-3 X b i1 i2 i3 = fill-2 (\i1 i2 -> Path (\i3 -> X i1 i2 i3) ((b.x__l) @ i1 @ i2) ((b.x__r) @ i1 @ i2))
+                             (box-1 (b.xll_) (b.xlr_) (b.xrl_) (b.xrr_) (b.x_l_) (b.x_r_) (b.xl__))
+                             i1 i2 @ i3
+
+cond-3-__l : (X : I -> I -> I -> Type)
+             (b : box-2 X)
+          -> (i1 i2 : I) -> fill-3 X b i1 i2 left = (b.x__l) @ i1 @ i2
+cond-3-__l _ _ _ _ = idp
+
+cond-3-__r : (X : I -> I -> I -> Type)
+             (b : box-2 X)
+          -> (i1 i2 : I) -> fill-3 X b i1 i2 right = (b.x__r) @ i1 @ i2
+cond-3-__r _ _ _ _ = idp
+
+cond-3-_l_ : (X : I -> I -> I -> Type)
+             (b : box-2 X)
+          -> (i1 i3 : I) -> fill-3 X b i1 left i3 = (b.x_l_) @ i1 @ i3
+cond-3-_l_ _ _ _ _ = idp
+
+cond-3-_r_ : (X : I -> I -> I -> Type)
+             (b : box-2 X)
+          -> (i1 i3 : I) -> fill-3 X b i1 right i3 = (b.x_r_) @ i1 @ i3
+cond-3-_r_ _ _ _ _ = idp
+
+cond-3-l__ : (X : I -> I -> I -> Type)
+             (b : box-2 X)
+          -> (i2 i3 : I) -> fill-3 X b left i2 i3 = (b.xl__) @ i2 @ i3
+cond-3-l__ _ _ _ _ = idp

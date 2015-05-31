@@ -1,0 +1,64 @@
+import Filler
+
+
+fill-id : {A : Type} {a b : A} (p : a = b)
+       -> path (\j -> fill-2 (\_ _ -> A) (box-1 a b a b idp idp p) right j) = p
+fill-id _ _ _ _ = idp
+
+inv : {A : Type} {a a' : A} -> a = a' -> a' = a
+inv A a a' p = path (\j -> fill-2 (\_ _ -> A) (box-1 a a a' a p idp idp) right j)
+
+idp-inv : {A : Type} {a : A} -> inv (idp' a) = idp' a
+idp-inv _ _ = idp
+
+concat3 : {A : Type} {a b c d : A} -> a = b -> b = c -> c = d -> a = d
+concat3 A a b c d ab bc cd = path (\j -> fill-2 (\_ _ -> A) (box-1 b c a d (inv ab) cd bc) right j)
+
+concat-left : {A : Type} {a b c : A} -> a = b -> b = c -> a = c
+concat-left _ _ _ _ p q = concat3 idp p q
+
+concat-left-idp : {A : Type} {a b : A} -> (p : a = b) -> concat-left p idp = p
+concat-left-idp _ _ _ _ = idp
+
+concat-right : {A : Type} {a b c : A} -> a = b -> b = c -> a = c
+concat-right _ _ _ _ p q = concat3 p q idp
+
+concat-right-idp : {A : Type} {a b : A} -> (p : a = b) -> concat-right idp p = p
+concat-right-idp _ _ _ _ = idp
+
+concat-mid : {A : Type} {a b c : A} -> a = b -> b = c -> a = c
+concat-mid _ _ _ _ p q = concat3 p idp q
+
+
+-----------
+
+
+ptrim-box : {A : Type} {a a' : A} (p : a = a') -> box-1 (\_ _ -> A)
+ptrim-box _ a a' p = box-1 a a a a' idp p idp
+
+ptrim2 : {A : Type} {a a' : A} (p : a = a') -> a = a'
+ptrim2 A a a' p = fill-2-h' A (ptrim-box p) @ right
+
+ptrim3 : {A : Type} {a a' : A} (p : a = a') -> Path (\k -> a = ptrim2 p @ k) idp p
+ptrim3 A a a' p = fill-2-v' A (ptrim-box p)
+
+ptrim : {A : Type} {a a' : A} (p : a = a') (i : I) -> a = p @ i
+ptrim A a a' p i = path (\k -> fill-3 (\_ _ _ -> A) (box-2 a a a a a a a a'
+                                                           idp idp idp (ptrim2 p) idp idp idp p idp idp idp p
+                                                           idp (ptrim3 p) idp (ptrim3 p) idp)
+                                                    right i k)
+
+ptrim'-box : {A : Type} {a a' : A} (p : a = a') -> box-1 (\_ _ -> A)
+ptrim'-box _ a a' p = box-1 a a' a' a' p idp p
+
+ptrim'2 : {A : Type} {a a' : A} (p : a = a') -> a' = a'
+ptrim'2 A a a' p = fill-2-h' A (ptrim'-box p) @ right
+
+ptrim'3 : {A : Type} {a a' : A} (p : a = a') -> Path (\k -> p @ k = ptrim'2 p @ k) p idp
+ptrim'3 A a a' p = fill-2-v' A (ptrim'-box p)
+
+ptrim' : {A : Type} {a a' : A} (p : a = a') (i : I) -> p @ i = a'
+ptrim' A a a' p i = path (\k -> fill-3 (\_ _ _ -> A) (box-2 a a a a' a a' a' a'
+                                                            idp p p (ptrim'2 p) idp p p idp idp p p idp
+                                                            (path (ptrim p)) (ptrim'3 p) (path (ptrim p)) (ptrim'3 p) (path (ptrim p)))
+                                                     right i k)

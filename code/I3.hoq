@@ -1,0 +1,45 @@
+import Filler
+import Paths
+
+
+data I1 = u | v | uv I
+  with
+    uv left  = u
+    uv right = v
+
+data I3 = a | b | c | d | bc I | ba I | cd I
+  with
+    bc left  = b
+    bc right = c
+    ba left  = b
+    ba right = a
+    cd left  = c
+    cd right = d
+
+f : I3 -> I1
+f a      = u
+f (ba _) = u
+f b      = u
+f (bc i) = uv i
+f c      = v
+f (cd _) = v
+f d      = v
+
+g : I1 -> I3
+g u      = a
+g (uv i) = fill-2 (\_ _ -> I3) (box-1 b c a d (path ba) (path cd) (path bc)) right i
+g v      = d
+
+g-then-f : (x : I1) -> x = f (g x)
+g-then-f u      = idp
+g-then-f (uv j) = path (\i -> f (fill-2 (\_ _ -> I3) (box-1 b c a d (path ba) (path cd) (path bc)) i j))
+g-then-f v      = idp
+
+f-then-g : (x : I3) -> x = g (f x)
+f-then-g a      = idp
+f-then-g (ba j) = ptrim' (path ba) j
+f-then-g b      = path ba
+f-then-g (bc j) = path (\i -> (fill-2 (\_ _ -> I3) (box-1 b c a d (path ba) (path cd) (path bc)) i j))
+f-then-g c      = path cd
+f-then-g (cd j) = ptrim' (path cd) j
+f-then-g d      = idp
