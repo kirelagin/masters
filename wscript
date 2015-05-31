@@ -39,7 +39,10 @@ def build(bld):
             'Use',
         ]),
         ('Equivalence', [
-            'Gluing',
+            'Spheres',
+            'OneDimension',
+            'MoreDimensions',
+            'Stepping',
         ]),
         ('PatternMatching', [
         ]),
