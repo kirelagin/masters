@@ -30,7 +30,8 @@ def build(bld):
         ]),
         ('Hoq', [
             'Hit',
-#            'Complexes',
+            'Conditions',
+            'Complexes',
         ]),
         ('Fillers', [
             'Cubical',
