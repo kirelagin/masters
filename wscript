@@ -26,11 +26,11 @@ def build(bld):
         ('TypeTheory', [
             'Mltt',
             'Hott',
-            'Hit',
-            'Conditions',
+            'Cubicaltt',
         ]),
-        ('CwComplexes', [
-            'Complexes',
+        ('Hoq', [
+            'Hit',
+#            'Complexes',
         ]),
         ('Fillers', [
             'Cubical',
