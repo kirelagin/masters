@@ -8,7 +8,7 @@
 \defaultfontfeatures{Mapping=tex-text}
 \setmainfont{Liberation Serif}
 \setsansfont{Liberation Sans}
-\newfontfamily\cyrillicfonttt[Scale=0.75,WordSpace=0.5]{Liberation Mono}
+\newfontfamily\cyrillicfonttt[Scale=0.75,WordSpace=0.5]{Hasklig}
 
 \usepackage{polyglossia}
 \setmainlanguage{russian}
@@ -165,7 +165,6 @@
 \definecolor{bluekw}{rgb}{0,0,0.5}
 \definecolor{redstrings}{rgb}{0.5,0,0}
 \definecolor{graylinenumbers}{rgb}{0.5,0.5,0.5}
-\input{pseudo.latex}
 \input{hoq.latex}
 \lstset{%
     language=hoq,
