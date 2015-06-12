@@ -37,7 +37,7 @@ cond-1-l : (X : I -> Type)
 cond-1-l X l = idp
 ~~~~
 
-Заполнитель для $0$-короба — ни что иное, как `coe`:
+Заполнитель для $0$-короба — не что иное, как `coe`:
 
 ~~~~{label=lst:fill-1-term}
 fill-1 X b i1 = coe X left (b.l) i1
