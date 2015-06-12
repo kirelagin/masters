@@ -1,0 +1,44 @@
+import Basic
+
+data S1 = base | loop I
+  with
+    loop left  = base
+    loop right = base
+
+data S1xS1 = pair S1 S1
+
+data Torus = point | loop1 I | loop2 I | surf I I
+  with
+    loop1 left  = point
+    loop1 right = point
+    loop2 left  = point
+    loop2 right = point
+    surf i left  = loop1 i
+    surf i right = loop1 i
+    surf left  j = loop2 j
+    surf right j = loop2 j
+
+
+f : S1xS1 -> Torus
+f (pair base base) = point
+f (pair (loop i) base) = loop1 i
+f (pair base (loop j)) = loop2 j
+f (pair (loop i) (loop j)) = surf i j
+
+g : Torus -> S1xS1
+g point = pair base base
+g (loop1 i) = pair (loop i) base
+g (loop2 j) = pair base (loop j)
+g (surf i j) = pair (loop i) (loop j)
+
+f-then-g : (x : S1xS1) -> x = g (f x)
+f-then-g (pair base base) = idp
+f-then-g (pair (loop _) base) = idp
+f-then-g (pair base (loop _)) = idp
+f-then-g (pair (loop _) (loop _)) = idp
+
+g-then-f : (x : Torus) -> x = f (g x)
+g-then-f point = idp
+g-then-f (loop1 _) = idp
+g-then-f (loop2 _) = idp
+g-then-f (surf _ _) = idp
