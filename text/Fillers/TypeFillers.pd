@@ -158,14 +158,15 @@ record box-n (X : I -> I -> … -> I -> Type) where
 
     -- 2-dimensional surfaces
     __l…l : Path (\i1 -> Path (\i2 -> X i1 i2 left … left)
-                               (_l…ll @ i1) (_r…ll @ i1))
+                              (_l…ll @ i1) (_r…ll @ i1))
                   l_l…l r_l…l
 
     …
 
     -- n-dimensional surfaces
     …
-    l_…_ : Path (\i2 -> Path (\i3 -> … Path (\in+1 -> X left i2 … in+1)…))
+    l_…_ : Path (\i2 -> Path (\i3 -> … Path (\in+1 ->
+             X left i2 … in+1)…))
                  …
                  ll_…_ lr_…_
  -- r_…_ is missing
@@ -200,7 +201,7 @@ fill-n X b i1 i2 … in+1 =
                              ((b._…_r) @ i1 @ … @ in))
          (box-n-1 (b.l…ll_) (b.l…lr_) (b.l…rl_) (b.l…rr_)
                    …
-                   (b._
-                   (b.l_…_))
+                  (b._
+                  (b.l_…_))
          i1 … in @ in+1
 ~~~~
