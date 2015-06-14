@@ -20,7 +20,22 @@ fill-id _ _ _ _ = idp
 
 Операция **обращения** пути, доказывающая симметричность
 равенства, может быть определена через заполнение короба, изображенного
-на \inlref{рисунке}{img:box-inv}, следующим образом: <!-- TODO pic -->
+на \inlref{рисунке}{img:box-inv}, следующим образом:
+
+\begin{figure}[ht]
+\begin{tikzpicture}[node distance=3]
+  \node[point={a'}{below}] (a) {};
+  \node[point={a}{below}] (b) [left= of a] {};
+  \node[point={a}{above}] (c) [above= of b] {};
+  \node[point={a}{above}] (d) [right= of c] {};
+  \path[->] (b) edge node[below] {p} (a)
+            (b) edge node[left] {idp} (c)
+            (c) edge node[above] {idp} (d)
+            (a) edge[dashed,thick] node[right] {inv(p)} (d);
+\end{tikzpicture}
+\caption{Обращение пути с помощью заполнителя}
+\label{img:box-inv}
+\end{figure}
 
 ~~~~
 inv : {A : Type} {a a' : A} -> a = a' -> a' = a
@@ -105,7 +120,7 @@ data A = a | b | ab I | …
 
 Пусть также есть некоторый тип `B` и два отображения — `f` и `g` —
 типа `A -> B`. Изобразим пути `pmap f ab` и `pmap g ab`
-(\inlref{рисунок}{img:filler-hmtp}<!-- TODO pic -->) и заметим, что отображения
+(\inlref{рисунок}{img:filler-hmtp}) и заметим, что отображения
 гомотопны если, и только если найдутся пути из `f a` в `g a`, из `f b` в `g b`,
 а также если можно заполнить получившийся квадрат. Это верно, поскольку
 горизонтальные пути, проходящие через квадрат, и есть те самые пути,
@@ -114,6 +129,24 @@ data A = a | b | ab I | …
 по определению `pmap`, `f (ab j) = g (ab j)`. При этом, пути `p` и `q` это те самые
 пути, которые необходимо использовать для доказательства `f a = g a` и
 `f b = g b` соответственно, чтобы выполнялись граничные условия.
+
+\begin{figure}[ht]
+\begin{tikzpicture}[node distance=3]
+  \node[point={g(a)}{below}] (a) {};
+  \node[point={f(a)}{below}] (b) [left= of a] {};
+  \node[point={f(b)}{above}] (c) [above= of b] {};
+  \node[point={g(b)}{above}] (d) [right= of c] {};
+  \coordinate [above= 0.7 of b] (x);
+  \coordinate [above= 0.7 of a] (y);
+  \path[->] (b) edge node[below] {p} (a)
+            (b) edge node[left] {f(ab)} (c)
+            (c) edge node[above] {q} (d)
+            (a) edge node[right] {g(ab)} (d)
+            (x) edge[dotted,thick] (y);
+\end{tikzpicture}
+\caption{Квадрат, заполненный гомотопией}
+\label{img:filler-hmtp}
+\end{figure}
 
 Кроме того, если `p` и `q` зафиксированы заранее, а `g` позволено выбрать какой угодно,
 то в качестве образа `path ab` под действием `g` можно взять путь,

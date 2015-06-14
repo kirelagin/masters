@@ -121,6 +121,9 @@
 \captionsetup[figure]{labelformat=gostcaption}
 \captionsetup[table]{labelformat=gostcaption}
 \captionsetup[lstlisting]{labelformat=gostcaption}
+\makeatletter
+\g@addto@macro\@floatboxreset\centering
+\makeatother
 
 
 \makeatletter
@@ -144,6 +147,23 @@
     \end{figure}
 }
 \def\figureautorefname{Рисунок}
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning}
+\tikzset{%
+  -,auto,node distance=1,
+  every node/.style={%
+    font=\ttfamily
+  },
+  point/.style 2 args={%
+    circle,fill,inner sep=1pt,
+    label={#2:#1}
+  },
+  every path/.style={%
+    >=stealth'
+  }
+}
 
 
 \usepackage{mathtools, amssymb}

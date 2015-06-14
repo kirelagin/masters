@@ -123,7 +123,26 @@ cond-2-l_ _ _ _ = idp
 На \inlref{рисунке}{img:box-2} изображено графически определение 2-короба, а
 \inlref{листинг}{lst:box-n} содержит схему определения типа `box-n` для произвольного $n$
 на языке hoq.
-<!-- TODO pic -->
+
+\begin{figure}[ht]
+\begin{tikzpicture}[scale=3, transform shape]
+  \coordinate (a);
+  \coordinate [above= of a] (b);
+  \coordinate [right= of b] (c);
+  \coordinate [below= of c] (d);
+  \coordinate [above right=0.3 and 0.3 of a] (e);
+  \coordinate [above= of e] (f);
+  \coordinate [right= of f] (g);
+  \coordinate [below= of g] (h);
+  \draw[fill=black!20] (e) -- (f) -- (g) -- (h) -- cycle;% back
+  \draw[fill=black!40] (a) -- (e) -- (h) -- (d) -- cycle;% bottom
+  \draw[fill=black!60] (a) -- (e) -- (f) -- (b) -- cycle;% left
+  \draw[fill=black!60,opacity=0.7] (d) -- (c) -- (g) -- (h) -- cycle;% right
+  \draw[fill=black!40,opacity=0.7] (b) -- (f) -- (g) -- (c) -- cycle;% top
+\end{tikzpicture}
+\caption{Открытый $2$-короб (отсутствует передняя грань)}
+\label{img:box-2}
+\end{figure}
 
 
 ~~~~{label=lst:box-n float=ht caption="Схема определения открытого $n$-короба"}

@@ -101,11 +101,41 @@ g-then-f : (x : I1) -> x = f (g x)
 что равно `path uv` по определению `f`, но мы поступим иначе.
 
 Вместо этого, мы напрямую построим искомые пути `uv j = f (g (uv j))`.
-На \inlref{рисунке}{img:g-then-f}<!-- TODO pic --> изображен заполнитель,
+На \inlref{рисунке}{img:g-then-f} изображен заполнитель,
 использованный в определении `g`. Подействуем на все изображенные пути
 отображением `f` и заметим, что горизонтальные пути, проходящие через
 заполненный квадрат, это как раз то, что мы ищем. Остается только
 выписать доказательство:
+
+\begin{figure}[ht]
+\begin{tikzpicture}[node distance=3]
+  \node[point={a}{below}] (a) {};
+  \node[point={b}{below}] (b) [left= of a] {};
+  \node[point={c}{above}] (c) [above= of b] {};
+  \node[point={d}{above}] (d) [right= of c] {};
+  \coordinate [above= 0.7 of b] (x);
+  \coordinate [above= 0.7 of a] (y);
+  \path (a) edge node[below] {ba} (b)
+        (b) edge node[left] {bc} (c)
+        (c) edge node[above] {cd} (d)
+        (d) edge[dashed,thick] node[right] {g(uv)} (a)
+        (x) edge[dotted,thick] (y);
+
+  \node[point={f(a)}{below}] (a2) [right= 8 of a] {};
+  \node[point={f(b)}{below}] (b2) [left= of a2] {};
+  \node[point={f(c)}{above}] (c2) [above= of b2] {};
+  \node[point={f(d)}{above}] (d2) [right= of c2] {};
+  \coordinate [above= 0.7 of b2] (x2);
+  \coordinate [above= 0.7 of a2] (y2);
+  \path (a2) edge node[below] {f(ba)} (b2)
+        (b2) edge node[left] {f(bc) $\equiv$ uv} (c2)
+        (c2) edge node[above] {f(cd)} (d2)
+        (d2) edge[dashed,thick] node[right] {f(g(uv))} (a2)
+        (x2) edge[dotted,thick] (y2);
+\end{tikzpicture}
+\caption{Поиск пути в заполнителе}
+\label{img:g-then-f}
+\end{figure}
 
 ~~~~
 g-then-f : (x : I1) -> x = f (g x)
