@@ -7,29 +7,29 @@ data S1 = base | loop I
 
 data S1xS1 = pair S1 S1
 
-data Torus = point | loop1 I | loop2 I | surf I I
+data Torus = base-base | loop-base I | base-loop I | loop-loop I I
   with
-    loop1 left  = point
-    loop1 right = point
-    loop2 left  = point
-    loop2 right = point
-    surf i left  = loop1 i
-    surf i right = loop1 i
-    surf left  j = loop2 j
-    surf right j = loop2 j
+    loop-base left  = base-base
+    loop-base right = base-base
+    base-loop left  = base-base
+    base-loop right = base-base
+    loop-loop i left  = loop-base i
+    loop-loop i right = loop-base i
+    loop-loop left  j = base-loop j
+    loop-loop right j = base-loop j
 
 
 f : S1xS1 -> Torus
-f (pair base base) = point
-f (pair (loop i) base) = loop1 i
-f (pair base (loop j)) = loop2 j
-f (pair (loop i) (loop j)) = surf i j
+f (pair base base) = base-base
+f (pair (loop i) base) = loop-base i
+f (pair base (loop j)) = base-loop j
+f (pair (loop i) (loop j)) = loop-loop i j
 
 g : Torus -> S1xS1
-g point = pair base base
-g (loop1 i) = pair (loop i) base
-g (loop2 j) = pair base (loop j)
-g (surf i j) = pair (loop i) (loop j)
+g base-base = pair base base
+g (loop-base i) = pair (loop i) base
+g (base-loop j) = pair base (loop j)
+g (loop-loop i j) = pair (loop i) (loop j)
 
 f-then-g : (x : S1xS1) -> x = g (f x)
 f-then-g (pair base base) = idp
@@ -38,7 +38,7 @@ f-then-g (pair base (loop _)) = idp
 f-then-g (pair (loop _) (loop _)) = idp
 
 g-then-f : (x : Torus) -> x = f (g x)
-g-then-f point = idp
-g-then-f (loop1 _) = idp
-g-then-f (loop2 _) = idp
-g-then-f (surf _ _) = idp
+g-then-f base-base = idp
+g-then-f (loop-base _) = idp
+g-then-f (base-loop _) = idp
+g-then-f (loop-loop _ _) = idp
