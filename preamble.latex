@@ -5,10 +5,9 @@
 \usepackage[absolute]{textpos}
 
 \usepackage{fontspec}
-\defaultfontfeatures{Mapping=tex-text}
 \setmainfont{Liberation Serif}
 \setsansfont{Liberation Sans}
-\newfontfamily\cyrillicfonttt[Scale=0.75,WordSpace=0.5]{Hasklig}
+\newfontfamily{\cyrillicfonttt}[Scale=0.75,WordSpace=0.5]{Liberation Mono}
 
 \usepackage{polyglossia}
 \setmainlanguage{russian}
