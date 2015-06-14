@@ -8,6 +8,21 @@
 в результате заполнения короба, изображенного на \inlref{рисунке}{img:box-id},
 получается вычислительно тот же самый путь:
 
+\begin{figure}[ht]
+\begin{tikzpicture}[node distance=3]
+  \node[point={a'}{below}] (a) {};
+  \node[point={a}{below}] (b) [left= of a] {};
+  \node[point={a}{above}] (c) [above= of b] {};
+  \node[point={a}{above}] (d) [right= of c] {};
+  \path[->] (b) edge node[below] {idp} (a)
+            (b) edge node[left] {p} (c)
+            (c) edge node[above] {idp} (d)
+            (a) edge[dashed,thick] node[right] {p} (d);
+\end{tikzpicture}
+\caption{Короб с двумя тривиальными путями}
+\label{img:box-id}
+\end{figure}
+
 ~~~~
 fill-id : {A : Type} {a b : A} (p : a = b)
        -> path (\j ->
