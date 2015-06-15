@@ -51,6 +51,10 @@ def build(bld):
 #        'Licensing',
     ])
 
+    bld(features='pandoc', source='text/Annotation.pd', target='Annotation.latex',
+            disabled_exts='fancy_lists',
+            flags='-R -S --latex-engine=xelatex --listings --chapters')
+
     bld(features='pandoc-merge', source=sources + ' bib.bib', target='text.latex',
             disabled_exts='fancy_lists',
             flags='-R -S --latex-engine=xelatex --listings --chapters',

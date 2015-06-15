@@ -9,7 +9,11 @@
 
 \input{title.latex}
 \addtocounter{page}{1}
-\null\clearpage
+
+\likechapterheading{\uppercase{Реферат}}
+
+\input{text/Annotation.latex}
+\clearpage
 
 \tableofcontents
 
