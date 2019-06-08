@@ -5,9 +5,9 @@
 \usepackage[absolute]{textpos}
 
 \usepackage{fontspec}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\newfontfamily{\cyrillicfonttt}[Scale=0.75,WordSpace=0.5]{Liberation Mono}
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\newfontfamily{\cyrillicfonttt}[Scale=0.75,WordSpace=0.5]{Courier}
 
 \usepackage{polyglossia}
 \setmainlanguage{russian}
@@ -98,6 +98,7 @@
     }
 }
 
+\def\tightlist{}
 \usepackage{enumitem}
 \makeatletter
 \AddEnumerateCounter{\asbuk}{\@asbuk}{м)}
@@ -180,6 +181,7 @@
 
 \usepackage{xcolor}
 \usepackage{listings}
+\newcommand{\passthrough}[1]{\lstset{mathescape=false}#1\lstset{mathescape=true}}
 \definecolor{greencomments}{rgb}{0,0.5,0}
 \definecolor{bluekw}{rgb}{0,0,0.5}
 \definecolor{redstrings}{rgb}{0.5,0,0}

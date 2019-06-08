@@ -93,7 +93,7 @@ g-then-f : (x : I1) -> x = f (g x)
 отображает отрезок в конкатенацию трех отрезков, так что этот тип вычислительно
 равен следующему: `path uv = pmap f (concat3 (inv (path ba)) (path bc) (path cd))`,
 а если раскрыть по определению `concat3` правую часть равенства, то получим
-`path uv = pmap f (fill-2 … (path ba) (path cd) (path bc))`.
+`path uv = pmap f (fill-2 ... (path ba) (path cd) (path bc))`.
 
 Теперь можно было бы доказать, что применение функции коммутирует с
 взятием заполнителя, и, поскольку `pmap f (path ba) = pmap f (path cd) = idp`

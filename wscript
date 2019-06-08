@@ -52,13 +52,15 @@ def build(bld):
     ])
 
     bld(features='pandoc', source='text/Annotation.pd', target='Annotation.latex',
-            disabled_exts='fancy_lists',
-            flags='-R -S --latex-engine=xelatex --listings --chapters')
+            disabled_exts='smart fancy_lists',
+            enabled_exts='raw_tex',
+            flags='--pdf-engine=xelatex --listings --top-level-division=chapter')
 
     bld(features='pandoc-merge', source=sources + ' bib.bib', target='text.latex',
-            disabled_exts='fancy_lists',
-            flags='-R -S --latex-engine=xelatex --listings --chapters',
-            linkflags='--toc --listings --chapters -R')
+            disabled_exts='smart fancy_lists',
+            enabled_exts='raw_tex',
+            flags='--pdf-engine=xelatex --listings --top-level-division=chapter',
+            linkflags='--toc --listings --top-level-division=chapter')
 
     # Outputs main.pdf
     bld(features='tex', type='xelatex', source='main.latex', prompt=True)

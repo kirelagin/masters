@@ -19,8 +19,10 @@ class cat(Task.Task):
 @TaskGen.feature('pandoc', 'pandoc-merge')
 def apply_read_format_extensions(self):
     disabled_exts = Utils.to_list(getattr(self, 'disabled_exts', []))
+    enabled_exts = Utils.to_list(getattr(self, 'enabled_exts', []))
     read_format = getattr(self, 'read_format', 'markdown')
     read_format += ''.join(('-' + e for e in disabled_exts))
+    read_format += ''.join(('+' + e for e in enabled_exts))
     self.read_format = read_format
 
 def partition(pred, iterable):
